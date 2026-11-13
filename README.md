@@ -16,13 +16,18 @@ Sistema de gestão de sócio torcedor para clubes de futebol.
 - Simplicidade de uso para times pequenos sem estrutura de TI
 - Compromisso com a paixão do futebol, sem perder o rigor técnico
 
-## Produto
+## Produtos
 
-- **TorcePlus Core** — plataforma web/mobile de gestão de sócio torcedor (cadastro, planos, cobrança recorrente, benefícios)
+A plataforma TorcePlus é composta por dois produtos integrados:
+
+- **TorcePlus Core** — plataforma web de gestão voltada ao clube (dashboard): cadastro e gestão de planos e benefícios, cobrança recorrente e acompanhamento de inadimplência, relatórios gerenciais, comunicação e campanhas, e controle de acesso por perfil de usuário.
+- **TorcePlus App** — aplicativo voltado ao torcedor: cadastro e adesão a um plano de sócio, consulta de dados e pagamentos, carteirinha digital e acesso aos benefícios.
 
 ## Clientes
 
 Clubes de futebol das séries B, C e D, e clubes de outras modalidades (basquete, vôlei) que têm programa de sócio torcedor ou querem lançar um.
+
+O **TorcePlus Core** é utilizado pelas equipes do clube (financeiro, marketing, atendimento etc.). O **TorcePlus App** é utilizado pelos torcedores/sócios desses clubes.
 
 ## Fornecedores e parceiros
 
@@ -55,34 +60,34 @@ Diretoria Executiva
 
 ## Principais processos
 
-- Onboarding de um novo clube na plataforma
-- Cadastro e ativação de novo sócio torcedor
+- Onboarding de um novo clube na plataforma (TorcePlus Core)
+- Cadastro e ativação de novo sócio torcedor (TorcePlus App)
 - Cobrança recorrente e tratamento de inadimplência
 - Emissão de carteirinha digital e liberação de benefícios
 - Atendimento e suporte ao torcedor
-- Geração de relatórios gerenciais para o clube
+- Geração de relatórios gerenciais para o clube (TorcePlus Core)
 
 ## Objetivos estratégicos
 
 1. Reduzir a taxa de inadimplência dos clubes clientes em 15% no primeiro ano de uso da plataforma
 2. Fechar contrato com 20 novos clubes até o fim de 2027
 3. Diminuir o tempo de onboarding de um clube novo de 30 para 10 dias
-4. Garantir conformidade total com a LGPD em todos os módulos do sistema
+4. Garantir conformidade total com a LGPD em todos os módulos do sistema (Core e App)
 
 ---
 
-# Sistema TorcePlus Core — Levantamento de Dados
+# Sistema TorcePlus (Core e App) — Levantamento de Dados
 
 ## Dados que o sistema produz e utiliza
 
-**Dados de fornecidos pelo torcedor:**
+**Dados fornecidos pelo torcedor (via TorcePlus App):**
 
 - Dados cadastrais: nome, CPF, data de nascimento, endereço, telefone, e-mail
 - Dados de pagamento: cartão de crédito (tokenizado), histórico de cobranças, forma de pagamento escolhida
 - Plano de sócio contratado e data de adesão
 - Preferências: time do coração dentro do clube (categoria/torcida organizada), setor preferido do estádio
 
-**Dados de fornecidos pelo clube:**
+**Dados fornecidos pelo clube (via TorcePlus Core):**
 
 - Dados cadastrais da instituição: Razão social, CNPJ, logotipo oficial e dados bancários do clube para recebimento dos repasses.
 - Calendário de jogos e eventos: Informações sobre partidas, datas, horários e locais para liberação de benefícios aos sócios.
@@ -92,19 +97,19 @@ Diretoria Executiva
 **Dados gerados pelo sistema:**
 
 - Status de adimplência/inadimplência
-- Pontuação de engajamento 
+- Pontuação de engajamento
 - Logs de acesso e uso da plataforma
 - Relatórios agregados de receita, churn e ocupação de setores
 
 ## Quem utiliza esses dados
 
-| Usuário | Uso |
-|---|---|
-| Torcedor/sócio | Consulta seus próprios dados, pagamentos e benefícios pelo app |
-| Time de atendimento do clube | Consulta cadastro e histórico para resolver chamados |
-| Financeiro do clube | Acompanha inadimplência e receita recorrente |
-| Marketing do clube | Usa dados de engajamento para campanhas segmentadas |
-| Equipe interna da TorcePlus | Suporte técnico, manutenção, evolução do produto |
+| Usuário | Produto | Uso |
+|---|---|---|
+| Torcedor/sócio | TorcePlus App | Consulta seus próprios dados, pagamentos e benefícios |
+| Time de atendimento do clube | TorcePlus Core | Consulta cadastro e histórico para resolver chamados |
+| Financeiro do clube | TorcePlus Core | Acompanha inadimplência e receita recorrente |
+| Marketing do clube | TorcePlus Core | Usa dados de engajamento para campanhas segmentadas |
+| Equipe interna da TorcePlus | Core e App | Suporte técnico, manutenção, evolução do produto |
 
 ## Onde os dados são armazenados
 
@@ -141,4 +146,4 @@ Diretoria Executiva
 - Anonimização/agregação de dados para relatórios de marketing, evitando exposição de dados individuais
 - Processo formal de consentimento (LGPD) no cadastro, com clareza sobre uso de dados de menores
 - Rotina de auditoria de acessos aos dados sensíveis
-- Política de retenção e descarte de dados de sócios inativos há mais de X anos
+- Política de retenção e descarte de dados de sócios inativos há mais de X anos.
