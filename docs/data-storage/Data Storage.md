@@ -1,32 +1,33 @@
-# Entrega 5 — Data Storage
+# Estratégia de Data Storage - Torcedor Plus
 
-## A. Armazenamento
-**1. Tecnologias Utilizadas**
-* **Banco Operacional (OLTP):** PostgreSQL 16.
-* **Cache e Sessão:** Redis 7.2.
+## A. Armazenamento e Tecnologias
+
+### 1. Tecnologias Utilizadas
+* **Banco Operacional (OLTP):** AWS RDS (PostgreSQL).
+* **Cache e Sessões:** Redis (In-Memory).
 * **Armazenamento de Arquivos:** Amazon S3.
-* **Ambiente Analítico (OLAP):** PostgreSQL Read-Replica / Data Lake.
+* **Ambiente Analítico (OLAP):** AWS Redshift.
 
-**2. Justificativas**
-* **PostgreSQL:** Conformidade ACID, suporte a JSONB e integridade referencial.
-* **Redis:** Velocidade em memória para rate limiting e sessões.
-* **S3:** Durabilidade e baixo custo para PDFs e imagens.
+### 2. Justificativas das Escolhas
+* **AWS RDS (PostgreSQL):** Conformidade ACID estrita, integridade relacional e suporte a RLS (Row-Level Security) para separar dados sensíveis.
+* **Redis:** Usado especificamente para guardar tokens de sessão e gerar o QR Code de acesso ao estádio em milissegundos, evitando sobrecarga no banco principal em dias de jogo.
+* **AWS Redshift:** Um Data Warehouse colunar focado em processar milhões de registros rapidamente para relatórios do clube.
+* **Amazon S3:** Para guardar imagens de perfil dos torcedores e banners das campanhas do clube.
 
-**3. Dados e Organização**
-* **PostgreSQL:** Dados relacionais em 3FN, chaves UUIDv4, índices B-Tree/GIN. Volume: 25GB iniciais a 500GB na maturidade. Escala vertical e réplicas de leitura.
-* **Redis:** Chave-valor com TTL.
-* **S3:** Hierarquia de buckets por ano/mês/tipo.
+### 3. Volume e Escalabilidade
+* **Volume Inicial:** Cadastros dos sócios torcedores e histórico de compras. O RDS suporta escala vertical (aumento de máquina).
+* Em caso de picos (ex: final de campeonato), o sistema utiliza o Redis para absorver a carga de leitura de QR Codes e réplicas de leitura no RDS.
 
 ## B. Persistência
-* **Persistentes:** Usuários, transações, logs (PostgreSQL/S3).
-* **Temporários:** Tokens, cache (Redis).
-* **Operações:** Inserção via transações seguras, atualização via *Soft Delete* (`deleted_at`), exclusão física restrita a dados temporários ou exigência LGPD. Prevenção de duplicidade por constraints UNIQUE e idempotência.
+* **Persistentes:** Perfil do Sócio Torcedor, mensalidades pagas e histórico de acesso (salvos no AWS RDS).
+* **Temporários:** Sessão do app e QR Code dinâmico do ingresso (salvos no Redis com expiração/TTL de 15 minutos).
+* A exclusão de usuários segue a LGPD via *Soft Delete* (apenas marcando `deleted_at`), apagando dados sensíveis mas mantendo o ID para estatísticas.
 
 ## C. Backup e Recuperação
-* **Estratégia:** Snapshot diário (S3 WORM) + WAL Streaming a cada 5 min (PITR).
-* **Retenção:** 30 dias (diário), 12 meses (mensal), 5 anos (anual).
-* **Recuperação:** Restauração de snapshot + WAL. RPO < 5 min, RTO < 1 hora.
+* **Estratégia:** Snapshot diário automatizado pelo AWS RDS + retenção de logs WAL para Point-in-Time Recovery (PITR).
+* **Retenção:** Snapshots mantidos por 30 dias em bucket S3 geograficamente separado.
 
 ## D. Transacional vs Analítico
-* **Operacional:** Mantém dados de alta cardinalidade no PostgreSQL primário (escritas rápidas).
-* **Analítico:** Réplica de leitura ou Data Lake para histórico e relatórios de BI, sem impactar a latência do cliente.
+* **Operacional (AWS RDS):** Onde as compras e check-ins no estádio acontecem em tempo real.
+* **Analítico (AWS Redshift):** Recebe os dados de forma desnormalizada durante a madrugada (ETL). 
+* **Regra de Privacidade (Modelagem):** Dados sensíveis como CPF, nome exato e cartão de crédito **NÃO** são enviados para o Redshift. Apenas os IDs dos torcedores, idades, planos e frequência nos jogos são migrados para gerar inteligência de negócio sem ferir a LGPD.
