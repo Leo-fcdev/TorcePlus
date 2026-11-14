@@ -1,33 +1,31 @@
-# Entrega 6 — Data Security
+# Segurança de Dados - Torcedor Plus
 
-## A. Identificação e Classificação
-* **Públicos:** Catálogos, preços, contatos institucionais.
-* **Internos:** Documentação de arquitetura, métricas, código-fonte.
-* **Confidenciais:** Contratos, faturamento.
-* **Sensíveis (LGPD):** Nomes completos, CPFs, senhas, logs de acesso.
+## A. Classificação dos Dados
+* **Públicos:** Planos de Sócio Torcedor disponíveis, valores e benefícios.
+* **Internos:** Métricas de vendas de ingressos, acessos ao estádio.
+* **Confidenciais:** Contratos do clube com gateways de pagamento.
+* **Sensíveis (LGPD):** CPF do torcedor, dados de pagamento, e-mail e senha.
 
-## B. Controle de Acesso
-* **Administrador:** Acesso completo com auditoria.
-* **Operador:** Acesso operacional, dados sensíveis mascarados.
-* **Cliente:** Acesso estrito aos próprios dados (Row-Level Security - RLS).
-* **Sistema Externo:** Acesso restrito a endpoints específicos.
+## B. Controle de Acesso (RBAC)
 
-## C. Autenticação e Autorização
-* **Autenticação:** OAuth 2.0 e JWT (RS256) com MFA exigido para admins.
-* **Autorização:** RBAC (Role-Based Access Control) embutido no token JWT.
-* **Tentativas Inválidas:** Retorno 401/403 e bloqueio de IP após 5 falhas (Rate Limiting).
+O sistema utiliza o padrão **RBAC** (Role-Based Access Control - Controle de Acesso Baseado em Perfis) para garantir que cada usuário veja apenas o que deve:
 
-## D. Proteção dos Dados
-* **Transmissão:** HTTPS / TLS 1.3.
-* **Armazenamento:** Encriptação AES-256 no disco. Hash Argon2id/bcrypt para senhas.
-* **Processamento:** Segredos gerenciados por Secrets Manager e injetados via variáveis de ambiente.
+* **Administrador (Clube):** Acesso a relatórios, campanhas e gestão de sócios.
+* **Operador (Catraca/Guichê):** Apenas permissão para validar o QR Code do torcedor no estádio.
+* **Cliente (Sócio Torcedor):** Tem acesso **exclusivo** aos próprios dados e histórico de pagamentos (Garantido pela política de RLS - Row-Level Security direto no banco de dados).
+* **Sistema Externo:** O Gateway de pagamento tem acesso apenas aos endpoints de Webhook via tokens específicos.
 
-## E. Auditoria
-Registro imutável em `audit_logs` contemplando: Ação (INSERT/UPDATE/DELETE), Tabela, ID do registro, Usuário, IP, Timestamp e valores antigos/novos.
+## C. Autenticação e Criptografia
+* **Login:** Via JWT (JSON Web Tokens). 
+* **Proteção de Senhas:** As senhas dos torcedores não são salvas em texto. Utilizamos o algoritmo de hash **Argon2id** (ou Bcrypt). Se o banco vazar, as senhas continuam indecifráveis, protegendo torcedores que repetem a mesma senha em vários sites.
 
-## F. Riscos e Mitigações
-1. **Vazamento de senha:** (Alto) -> Uso de hash lento Argon2id.
-2. **Acesso indevido:** (Alto) -> RBAC e RLS no banco de dados.
-3. **Interceptação de dados:** (Alto) -> Obrigatório HTTPS/TLS 1.3.
-4. **Injeção de SQL:** (Alto) -> ORM e Prepared Statements.
-5. **Exclusão acidental:** (Médio) -> Soft Delete e Backups imutáveis.
+## D. Proteção da Infraestrutura
+* **Em Trânsito:** Toda comunicação do App Torcedor Plus com o backend usa HTTPS / TLS 1.3.
+* **ORM:** Para evitar injeções de SQL (SQLi) diretas no banco AWS RDS, utilizamos o **Prisma ORM**, que mapeia os objetos de código para SQL de forma blindada e parametrizada.
+
+## E. Riscos e Mitigações
+1. **Injeção SQL no App:** (Alto) Mitigado pelo uso de Prisma ORM.
+2. **Vazamento de Senha:** (Alto) Mitigado pelo uso de Hash Argon2id.
+3. **Roubo de Sessão (MitM):** (Alto) Mitigado por HTTPS obrigatório.
+4. **Perda de Dados do Clube:** (Alto) Mitigado por Snapshots diários no AWS RDS.
+5. **Acesso Indevido:** (Médio) Mitigado por RBAC e RLS.
