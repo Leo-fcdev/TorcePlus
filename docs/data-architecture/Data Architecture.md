@@ -21,4 +21,5 @@ A arquitetura de dados do TorcePlus foi redesenhada para unificar as funcionalid
 
 ### C. Transacional vs Analítico
 * **Banco Operacional (Transacional / OLTP):** Focado no tempo de resposta rápido para o torcedor (ex: login, pagamento, atualização de cadastro). Trabalha com dados normalizados para garantir a integridade da cobrança mês a mês.
+
 * **Data Warehouse (Analítico / OLAP):** Focado em leitura de grandes volumes de dados de forma rápida. Ele responde às perguntas do módulo Insights: "Qual a taxa de cancelamento de planos familiares neste semestre?" ou "Qual a previsão de receita para o mês que vem?".

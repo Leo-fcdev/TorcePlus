@@ -1,4 +1,4 @@
-# Entrega 8 — Integração das Entregas
+# Integração das Entregas
 
 A arquitetura final interliga os conceitos de forma estruturada:
 
